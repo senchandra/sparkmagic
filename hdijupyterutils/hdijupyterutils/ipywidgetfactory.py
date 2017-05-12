@@ -1,7 +1,7 @@
 # Copyright (c) 2015  aggftw@gmail.com
 # Distributed under the terms of the Modified BSD License.
 
-from ipywidgets import VBox, Output, Button, HTML, HBox, Dropdown, Checkbox, ToggleButtons, Text, Textarea, Tab
+from ipywidgets import VBox, Output, Button, HTML, HBox, Dropdown, Checkbox, ToggleButtons, Text, Textarea, Tab, Password
 
 
 class IpyWidgetFactory(object):
@@ -54,6 +54,10 @@ class IpyWidgetFactory(object):
     @staticmethod
     def get_tab(**kwargs):
         return Tab(**kwargs)
+
+    @staticmethod
+    def get_password(**kwargs):
+        return Password(**kwargs)
 
 
 class SubmitButton(Button):

@@ -27,9 +27,8 @@ class AddEndpointWidget(AbstractMenuWidget):
             value='username',
             width=widget_width
         )
-        self.password_widget = self.ipywidget_factory.get_text(
+        self.password_widget = self.ipywidget_factory.get_password(
             description='Password:',
-            value='password',
             width=widget_width
         )
 
