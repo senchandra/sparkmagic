@@ -2,11 +2,14 @@
 # Distributed under the terms of the Modified BSD License.
 import json
 from time import sleep
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 import requests
+import subprocess
 
 import sparkmagic.utils.configuration as conf
 from sparkmagic.utils.sparklogger import SparkLog
 from sparkmagic.utils.constants import MAGICS_LOGGER_NAME
+import sparkmagic.utils.constants as constants
 from sparkmagic.livyclientlib.exceptions import HttpClientException
 
 
@@ -17,7 +20,11 @@ class ReliableHttpClient(object):
         self._endpoint = endpoint
         self._headers = headers
         self._retry_policy = retry_policy
-        self.logger = SparkLog(u"ReliableHttpClient")
+        # if self._endpoint.auth_type == constants.AUTH_KERBEROS:
+        #     self._auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
+        # elif self._endpoint.auth_type == constants.AUTH_SSL:
+        #     self._auth = (self._endpoint.username, self._endpoint.password)
+        # self.logger = SparkLog(u"ReliableHttpClient")
 
         self.verify_ssl = not conf.ignore_ssl_errors()
         if not self.verify_ssl:
@@ -44,20 +51,28 @@ class ReliableHttpClient(object):
         return self._send_request_helper(self.compose_url(relative_url), accepted_status_codes, function, data, 0)
 
     def _send_request_helper(self, url, accepted_status_codes, function, data, retry_count):
+        # self.logger.debug("Starting Url = {}, Auth Type = {}, Data = {}".format(url, self._endpoint.auth_type, json.dumps(data)))
         while True:
             try:
-                if not self._endpoint.authenticate:
+                if self._endpoint.auth_type == constants.NO_AUTH:
                     if data is None:
                         r = function(url, headers=self._headers, verify=self.verify_ssl)
                     else:
                         r = function(url, headers=self._headers, data=json.dumps(data), verify=self.verify_ssl)
                 else:
-                    if data is None:
-                        r = function(url, headers=self._headers, auth=(self._endpoint.username, self._endpoint.password),
-                                     verify=self.verify_ssl)
+                    if self._endpoint.auth_type == constants.AUTH_SSL:
+                        auth = (self._endpoint.username, self._endpoint.password)
+                    elif self._endpoint.auth_type == constants.AUTH_KERBEROS:
+                        from requests_kerberos import HTTPKerberosAuth, REQUIRED
+                        principal = subprocess.check_output("klist | grep 'Principal:' | awk '{print $NF}'", shell=True).decode("utf-8").strip()
+                        auth = HTTPKerberosAuth(principal=principal, mutual_authentication=REQUIRED, force_preemptive=True)
                     else:
-                        r = function(url, headers=self._headers, auth=(self._endpoint.username, self._endpoint.password),
-                                     data=json.dumps(data), verify=self.verify_ssl)
+                        raise ValueError("Unsupported authentication type {}".format(self._endpoint.auth_type))
+                    
+                    if data is None:
+                        r = function(url, headers=self._headers, auth=auth, verify=self.verify_ssl)
+                    else:
+                        r = function(url, headers=self._headers, auth=auth, data=json.dumps(data), verify=self.verify_ssl)
             except requests.exceptions.RequestException as e:
                 error = True
                 r = None

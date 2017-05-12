@@ -14,7 +14,7 @@ from hdijupyterutils.utils import generate_uuid
 import sparkmagic.utils.configuration as conf
 from sparkmagic.utils.utils import get_livy_kind, parse_argstring_or_throw
 from sparkmagic.utils.sparkevents import SparkEvents
-from sparkmagic.utils.constants import LANGS_SUPPORTED
+from sparkmagic.utils.constants import LANGS_SUPPORTED, NO_AUTH, AUTH_SSL, POSSIBLE_AUTH
 from sparkmagic.livyclientlib.command import Command
 from sparkmagic.livyclientlib.endpoint import Endpoint
 from sparkmagic.magics.sparkmagicsbase import SparkMagicBase
@@ -346,12 +346,14 @@ class KernelMagics(SparkMagicBase):
 
     @magic_arguments()
     @line_magic
+    @argument("-t", "--auth_type", type=str, default=NO_AUTH, choices=POSSIBLE_AUTH, help="Authentication type for HTTP access to Livy endpoint.")
     @argument("-u", "--username", type=str, help="Username to use.")
     @argument("-p", "--password", type=str, help="Password to use.")
     @argument("-s", "--server", type=str, help="Url of server to use.")
     @_event
     def _do_not_call_change_endpoint(self, line, cell="", local_ns=None):
         args = parse_argstring_or_throw(self._do_not_call_change_endpoint, line)
+        auth_type = args.auth_type
         username = args.username
         password = args.password
         server = args.server
@@ -360,12 +362,12 @@ class KernelMagics(SparkMagicBase):
             error = u"Cannot change the endpoint if a session has been started."
             raise BadUserDataException(error)
 
-        self.endpoint = Endpoint(server, username, password)
+        self.endpoint = Endpoint(server, auth_type, username, password)
 
     def refresh_configuration(self):
         credentials = getattr(conf, 'base64_kernel_' + self.language + '_credentials')()
-        (username, password, url) = (credentials['username'], credentials['password'], credentials['url'])
-        self.endpoint = Endpoint(url, username, password)
+        (username, password, auth_type, url) = (credentials['username'], credentials['password'], credentials['auth_type'], credentials['url'])
+        self.endpoint = Endpoint(url, auth_type, username, password)
 
     def get_session_settings(self, line, force):
         line = line.strip()

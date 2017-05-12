@@ -165,7 +165,8 @@ def test_change_endpoint():
     u = 'user'
     p = 'password'
     s = 'server'
-    line = "-s {} -u {} -p {}".format(s, u, p)
+    t = constants.AUTH_SSL
+    line = "-s {} -t {} -u {} -p {}".format(s, t, u, p)
 
     magic._do_not_call_change_endpoint(line)
 
@@ -178,7 +179,8 @@ def test_change_endpoint_session_started():
     u = 'user'
     p = 'password'
     s = 'server'
-    line = "-s {} -u {} -p {}".format(s, u, p)
+    t = constants.AUTH_SSL
+    line = "-s {} -t {} -u {} -p {}".format(s, t, u, p)
     magic.session_started = True
 
     magic._do_not_call_change_endpoint(line)
