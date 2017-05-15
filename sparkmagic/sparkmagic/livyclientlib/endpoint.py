@@ -9,6 +9,7 @@ class Endpoint(object):
         self.username = username
         self.password = password
         self.auth_type = auth_type
+        self.cookies = None
         self.authenticate = False if self.auth_type == constants.NO_AUTH else True
 
     def __eq__(self, other):

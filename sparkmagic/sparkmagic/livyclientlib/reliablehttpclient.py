@@ -20,11 +20,7 @@ class ReliableHttpClient(object):
         self._endpoint = endpoint
         self._headers = headers
         self._retry_policy = retry_policy
-        # if self._endpoint.auth_type == constants.AUTH_KERBEROS:
-        #     self._auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
-        # elif self._endpoint.auth_type == constants.AUTH_SSL:
-        #     self._auth = (self._endpoint.username, self._endpoint.password)
-        # self.logger = SparkLog(u"ReliableHttpClient")
+        self.logger = SparkLog(u"ReliableHttpClient")
 
         self.verify_ssl = not conf.ignore_ssl_errors()
         if not self.verify_ssl:
@@ -62,6 +58,9 @@ class ReliableHttpClient(object):
                 else:
                     if self._endpoint.auth_type == constants.AUTH_SSL:
                         auth = (self._endpoint.username, self._endpoint.password)
+                    elif self._endpoint.auth_type == constants.AUTH_LDAP:
+                        from requests.auth import HTTPBasicAuth
+                        auth = HTTPBasicAuth(self._endpoint.username, self._endpoint.password)
                     elif self._endpoint.auth_type == constants.AUTH_KERBEROS:
                         from requests_kerberos import HTTPKerberosAuth, REQUIRED
                         principal = subprocess.check_output("klist | grep 'Principal:' | awk '{print $NF}'", shell=True).decode("utf-8").strip()
@@ -70,9 +69,9 @@ class ReliableHttpClient(object):
                         raise ValueError("Unsupported authentication type {}".format(self._endpoint.auth_type))
                     
                     if data is None:
-                        r = function(url, headers=self._headers, auth=auth, verify=self.verify_ssl)
+                        r = function(url, headers=self._headers, auth=auth, verify=self.verify_ssl, cookies = self._endpoint.cookies)
                     else:
-                        r = function(url, headers=self._headers, auth=auth, data=json.dumps(data), verify=self.verify_ssl)
+                        r = function(url, headers=self._headers, auth=auth, data=json.dumps(data), verify=self.verify_ssl, cookies = self._endpoint.cookies)
             except requests.exceptions.RequestException as e:
                 error = True
                 r = None
@@ -96,4 +95,6 @@ class ReliableHttpClient(object):
                 else:
                     raise HttpClientException(u"Invalid status code '{}' from {} with error payload: {}"
                                               .format(status, url, text))
+            if r.cookies.get('hadoop.auth') and not self._endpoint.cookies:
+                self._endpoint.cookies = {'hadoop.auth' : r.cookies.get('hadoop.auth')}
             return r

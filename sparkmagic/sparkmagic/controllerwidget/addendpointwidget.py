@@ -20,7 +20,7 @@ class AddEndpointWidget(AbstractMenuWidget):
 
         self.address_widget = self.ipywidget_factory.get_text(
             description='Address:',
-            value='http://lva1-pokemonaz01.grid.linkedin.com:8998',
+            value='https://lva1-pokemon-livy01.grid.linkedin.com:8998',
             width=widget_width
         )
         self.user_widget = self.ipywidget_factory.get_text(
@@ -34,7 +34,9 @@ class AddEndpointWidget(AbstractMenuWidget):
             width=widget_width
         )
         self.auth_type = self.ipywidget_factory.get_dropdown(
-            options={constants.AUTH_KERBEROS: constants.AUTH_KERBEROS, constants.AUTH_SSL: constants.AUTH_SSL,
+            options={constants.AUTH_LDAP: constants.AUTH_LDAP,
+                     constants.AUTH_KERBEROS: constants.AUTH_KERBEROS,
+                     constants.AUTH_SSL: constants.AUTH_SSL,
                      constants.NO_AUTH: constants.NO_AUTH},
             description=u"Auth type:"
         )
