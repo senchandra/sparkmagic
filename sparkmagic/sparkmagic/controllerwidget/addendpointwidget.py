@@ -30,7 +30,6 @@ class AddEndpointWidget(AbstractMenuWidget):
         )
         self.password_widget = self.ipywidget_factory.get_password(
             description='Password:',
-            value='password',
             width=widget_width
         )
         self.auth_type = self.ipywidget_factory.get_dropdown(

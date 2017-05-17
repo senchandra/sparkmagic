@@ -47,7 +47,8 @@ class ReliableHttpClient(object):
         return self._send_request_helper(self.compose_url(relative_url), accepted_status_codes, function, data, 0)
 
     def _send_request_helper(self, url, accepted_status_codes, function, data, retry_count):
-        # self.logger.debug("Starting Url = {}, Auth Type = {}, Data = {}".format(url, self._endpoint.auth_type, json.dumps(data)))
+        self.logger.debug(
+            "Starting Url = {}, Auth Type = {}, Data = {}".format(url, self._endpoint.auth_type, json.dumps(data)))
         while True:
             try:
                 if self._endpoint.auth_type == constants.NO_AUTH:
@@ -83,6 +84,8 @@ class ReliableHttpClient(object):
                 error = False
                 status = r.status_code
                 text = r.text
+                if self._endpoint.auth_type == constants.AUTH_LDAP and self._endpoint.password:
+                    self._endpoint.password = ""
 
             if error or status not in accepted_status_codes:
                 if self._retry_policy.should_retry(status, error, retry_count):
