@@ -1,6 +1,6 @@
 nose
 mock
-ipywidgets>=7.0.0a2,<8.0
+ipywidgets>5.0.0,<6.0
 ipython==4.0.2
 ipykernel==4.2.2
 pandas==0.17.1
