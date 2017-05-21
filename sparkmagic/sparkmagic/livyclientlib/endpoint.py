@@ -2,7 +2,7 @@ from .exceptions import BadUserDataException
 import sparkmagic.utils.constants as constants
 
 class Endpoint(object):
-    def __init__(self, url, auth_type=constants.NO_AUTH, username="", password=""):
+    def __init__(self, url=constants.SPARK1, auth_type=constants.NO_AUTH, username="", password=""):
         if not url:
             raise BadUserDataException(u"URL must not be empty")
         self.url = url.rstrip(u"/")

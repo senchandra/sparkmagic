@@ -99,3 +99,9 @@ AUTH_KERBEROS = "kerberos"
 AUTH_SSL = "username/password"
 AUTH_LDAP = "ldap"
 POSSIBLE_AUTH = [NO_AUTH, AUTH_KERBEROS, AUTH_SSL, AUTH_LDAP]
+
+SPARK1_ENDPOINT = "https://ltx1-holdemlivy01.grid.linkedin.com:8998"
+SPARK2_ENDPOINT = "https://ltx1-holdemlivy02.grid.linkedin.com:8998"
+SPARK1 = "Spark 1.6.3"
+SPARK2 = "Spark 2.1.0"
+POSSIBLE_SPARK = [SPARK1, SPARK2]

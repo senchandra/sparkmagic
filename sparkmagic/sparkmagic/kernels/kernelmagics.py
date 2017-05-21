@@ -14,7 +14,7 @@ from hdijupyterutils.utils import generate_uuid
 import sparkmagic.utils.configuration as conf
 from sparkmagic.utils.utils import get_livy_kind, parse_argstring_or_throw
 from sparkmagic.utils.sparkevents import SparkEvents
-from sparkmagic.utils.constants import LANGS_SUPPORTED, NO_AUTH, AUTH_SSL, POSSIBLE_AUTH
+from sparkmagic.utils.constants import LANGS_SUPPORTED, NO_AUTH, AUTH_SSL, POSSIBLE_AUTH, SPARK1, POSSIBLE_SPARK
 from sparkmagic.livyclientlib.command import Command
 from sparkmagic.livyclientlib.endpoint import Endpoint
 from sparkmagic.magics.sparkmagicsbase import SparkMagicBase
@@ -46,7 +46,7 @@ class KernelMagics(SparkMagicBase):
     def __init__(self, shell, data=None, spark_events=None):
         # You must call the parent constructor
         super(KernelMagics, self).__init__(shell, data)
-        
+
         self.session_name = u"session_name"
         self.session_started = False
 
@@ -349,7 +349,7 @@ class KernelMagics(SparkMagicBase):
     @argument("-t", "--auth_type", type=str, default=NO_AUTH, choices=POSSIBLE_AUTH, help="Authentication type for HTTP access to Livy endpoint.")
     @argument("-u", "--username", type=str, help="Username to use.")
     @argument("-p", "--password", type=str, help="Password to use.")
-    @argument("-s", "--server", type=str, help="Url of server to use.")
+    @argument("-s", "--server", type=str, default=SPARK1, choices=POSSIBLE_SPARK, help="Url of server to use.")
     @_event
     def _do_not_call_change_endpoint(self, line, cell="", local_ns=None):
         args = parse_argstring_or_throw(self._do_not_call_change_endpoint, line)

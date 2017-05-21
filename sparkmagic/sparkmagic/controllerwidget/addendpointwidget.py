@@ -12,24 +12,24 @@ class AddEndpointWidget(AbstractMenuWidget):
         # This is nested
         super(AddEndpointWidget, self).__init__(spark_controller, ipywidget_factory, ipython_display, True)
 
-        widget_width = "800px"
+        widget_width = "300px"
 
         self.endpoints = endpoints
         self.endpoints_dropdown_widget = endpoints_dropdown_widget
         self.refresh_method = refresh_method
 
-        self.address_widget = self.ipywidget_factory.get_text(
-            description='Address:',
-            value='https://lva1-pokemon-livy01.grid.linkedin.com:8998',
-            width=widget_width
+        self.address_widget = self.ipywidget_factory.get_dropdown(
+            options={constants.SPARK1:constants.SPARK1_ENDPOINT,
+                     constants.SPARK2:constants.SPARK2_ENDPOINT},
+            description='Endpoint'
         )
         self.user_widget = self.ipywidget_factory.get_text(
-            description='Username:',
+            description='Username',
             value='username',
             width=widget_width
         )
         self.password_widget = self.ipywidget_factory.get_password(
-            description='Password:',
+            description='Password+VIP',
             width=widget_width
         )
         self.auth_type = self.ipywidget_factory.get_dropdown(
