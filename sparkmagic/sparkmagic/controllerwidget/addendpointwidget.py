@@ -2,11 +2,11 @@
 # Distributed under the terms of the Modified BSD License.
 from sparkmagic.controllerwidget.abstractmenuwidget import AbstractMenuWidget
 from sparkmagic.livyclientlib.endpoint import Endpoint
+import sparkmagic.utils.configuration as conf
 import sparkmagic.utils.constants as constants
 
 
 class AddEndpointWidget(AbstractMenuWidget):
-
     def __init__(self, spark_controller, ipywidget_factory, ipython_display, endpoints, endpoints_dropdown_widget,
                  refresh_method):
         # This is nested
@@ -19,8 +19,8 @@ class AddEndpointWidget(AbstractMenuWidget):
         self.refresh_method = refresh_method
 
         self.address_widget = self.ipywidget_factory.get_dropdown(
-            options={constants.SPARK1:constants.SPARK1_ENDPOINT,
-                     constants.SPARK2:constants.SPARK2_ENDPOINT},
+            options={constants.SPARK1: constants.SPARK1_ENDPOINT,
+                     constants.SPARK2: constants.SPARK2_ENDPOINT},
             description='Endpoint'
         )
         self.user_widget = self.ipywidget_factory.get_text(
@@ -32,28 +32,30 @@ class AddEndpointWidget(AbstractMenuWidget):
             description='Password+VIP',
             width=widget_width
         )
-        self.auth_type = self.ipywidget_factory.get_dropdown(
-            options={constants.AUTH_LDAP: constants.AUTH_LDAP,
-                     constants.AUTH_KERBEROS: constants.AUTH_KERBEROS,
-                     constants.AUTH_SSL: constants.AUTH_SSL,
-                     constants.NO_AUTH: constants.NO_AUTH},
-            description=u"Auth type:"
-        )
-
         # Submit widget
         self.submit_widget = self.ipywidget_factory.get_submit_button(
             description='Add endpoint'
         )
-
-        self.children = [self.ipywidget_factory.get_html(value="<br/>", width=widget_width),
-                         self.address_widget, self.auth_type, self.user_widget, self.password_widget,
-                         self.ipywidget_factory.get_html(value="<br/>", width=widget_width), self.submit_widget]
-
+        self.children = (self.ipywidget_factory.get_html(value="<br/>", width=widget_width),
+                         self.address_widget)
+        if not conf.authentication_type():
+            self.auth_type = self.ipywidget_factory.get_dropdown(
+                options={constants.AUTH_LDAP: constants.AUTH_LDAP,
+                         constants.AUTH_KERBEROS: constants.AUTH_KERBEROS,
+                         constants.AUTH_SSL: constants.AUTH_SSL,
+                         constants.NO_AUTH: constants.NO_AUTH},
+                description=u"Auth type"
+            )
+            self.children = self.children + (self.auth_type, )
+        self.children = self.children + (self.user_widget, self.password_widget,
+                                         self.ipywidget_factory.get_html(value="<br/>", width=widget_width),
+                                         self.submit_widget)
         for child in self.children:
             child.parent_widget = self
 
     def run(self):
-        endpoint = Endpoint(self.address_widget.value, self.auth_type.value, self.user_widget.value, self.password_widget.value)
+        auth_type = conf.authentication_type() if conf.authentication_type() else self.auth_type.value
+        endpoint = Endpoint(self.address_widget.value, auth_type, self.user_widget.value, self.password_widget.value)
         self.endpoints[self.address_widget.value] = endpoint
         self.ipython_display.writeln("Added endpoint {}".format(self.address_widget.value))
 

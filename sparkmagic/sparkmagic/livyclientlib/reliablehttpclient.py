@@ -68,7 +68,7 @@ class ReliableHttpClient(object):
                         auth = HTTPKerberosAuth(principal=principal, mutual_authentication=REQUIRED, force_preemptive=True)
                     else:
                         raise ValueError("Unsupported authentication type {}".format(self._endpoint.auth_type))
-                    
+
                     if data is None:
                         r = function(url, headers=self._headers, auth=auth, verify=self.verify_ssl, cookies = self._endpoint.cookies)
                     else:
@@ -98,6 +98,7 @@ class ReliableHttpClient(object):
                 else:
                     raise HttpClientException(u"Invalid status code '{}' from {} with error payload: {}"
                                               .format(status, url, text))
-            if r.cookies.get('hadoop.auth') and not self._endpoint.cookies:
-                self._endpoint.cookies = {'hadoop.auth' : r.cookies.get('hadoop.auth')}
+            cookie_name = conf.authentication_cookie_name()
+            if cookie_name and r.cookies.get(cookie_name) and not self._endpoint.cookies:
+                self._endpoint.cookies = {cookie_name : r.cookies.get(cookie_name)}
             return r
