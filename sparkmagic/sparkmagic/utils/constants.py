@@ -97,7 +97,7 @@ KERBEROS_TIME_INTERVAL = 6000
 NO_AUTH = "no auth"
 AUTH_KERBEROS = "kerberos"
 AUTH_SSL = "username/password"
-AUTH_LDAP = "ldap"
+AUTH_LDAP = "LDAP"
 POSSIBLE_AUTH = [NO_AUTH, AUTH_KERBEROS, AUTH_SSL, AUTH_LDAP]
 
 SPARK1_ENDPOINT = "https://ltx1-holdemlivy01.grid.linkedin.com:8998"

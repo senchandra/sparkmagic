@@ -87,8 +87,8 @@ setup(name=NAME,
           'requests',
           'requests_kerberos',
           'ipykernel>=4.2.2,<5',
-          'ipywidgets>5.0.0,<6.0',
-          'notebook>=4.2,<5.0',
+          'ipywidgets>=7.0.0a4,<8.0',
+          'notebook>=5.0.0',
           'tornado>=4'
       ])
 

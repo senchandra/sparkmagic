@@ -99,7 +99,10 @@ class ManageEndpointWidget(AbstractMenuWidget):
         return delete_w
 
     def get_delete_session_endpoint_widget(self, url, endpoint):
-        session_text = self.ipywidget_factory.get_text(description="Session to delete:", value="0", width="50px")
+        session_text = self.ipywidget_factory.get_text(description="Session to delete:",
+                                                       width='50px',
+                                                       style=dict(description_width='initial'),
+                                                       value="0")
 
         def delete_endpoint(button):
             try:
@@ -110,7 +113,8 @@ class ManageEndpointWidget(AbstractMenuWidget):
                 self.ipython_display.send_error(str(e))
                 return
 
-        button = self.ipywidget_factory.get_button(description="Delete")
+        button = self.ipywidget_factory.get_button(description="Delete",
+                                                   button_style='danger')
         button.on_click(delete_endpoint)
 
         return self.ipywidget_factory.get_hbox(children=[session_text, button], width="152px")
@@ -130,7 +134,7 @@ class ManageEndpointWidget(AbstractMenuWidget):
 
     def initialize_kerberos(self, endpoint):
         if endpoint.auth_type == constants.AUTH_KERBEROS and self.kerberos_info.get(endpoint.username) is not None:
-            #Stop flag can be used to stop renewing kerberos ticket for the user
+            # Stop flag can be used to stop renewing kerberos ticket for the user
             stop_flag = Event()
             KerberosThread(stop_flag, endpoint).start()
             self.kerberos_info[endpoint.username] = stop_flag
