@@ -8,11 +8,12 @@ class Endpoint(object):
             raise BadUserDataException(u"URL must not be empty")
         if auth not in AUTHS_SUPPORTED:
             raise BadUserConfigurationException(u"Auth '{}' not supported".format(auth))
-        
+
         self.url = url.rstrip(u"/")
         self.username = username
         self.password = password
         self.auth = auth
+        self.cookies = None
         # implicitly_added is set to True only if the endpoint wasn't configured manually by the user through
         # a widget, but was instead implicitly defined as an endpoint to a wrapper kernel in the configuration
         # JSON file.
