@@ -368,7 +368,7 @@ def test_run_spark_with_store_command_parses():
     result = magic.spark(line, cell)
     magic.execute_spark.assert_called_once_with("cell code",
                                                 "var_name", "sample", None, None, "sessions_name", None)
-    
+
 
 @with_setup(_setup, _teardown)
 def test_run_spark_with_store_correct_calls():

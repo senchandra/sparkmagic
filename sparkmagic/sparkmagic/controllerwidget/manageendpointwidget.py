@@ -1,6 +1,10 @@
 # Copyright (c) 2015  aggftw@gmail.com
 # Distributed under the terms of the Modified BSD License.
+from threading import Event
+import time
+
 from sparkmagic.controllerwidget.abstractmenuwidget import AbstractMenuWidget
+import sparkmagic.utils.constants as constants
 
 
 class ManageEndpointWidget(AbstractMenuWidget):
@@ -10,7 +14,6 @@ class ManageEndpointWidget(AbstractMenuWidget):
 
         self.endpoints = endpoints
         self.refresh_method = refresh_method
-
         self.children = self.get_existing_endpoint_widgets()
 
         for child in self.children:
@@ -21,11 +24,12 @@ class ManageEndpointWidget(AbstractMenuWidget):
 
     def get_existing_endpoint_widgets(self):
         endpoint_widgets = []
-        endpoint_widgets.append(self.ipywidget_factory.get_html(value="<br/>", width="600px"))
+        # endpoint_widgets.append(self.ipywidget_factory.get_html(value="<br/>", width="600px"))
 
         if len(self.endpoints) > 0:
             # Header
-            header = self.ipywidget_factory.get_html(value="Endpoint")
+            # header = self.ipywidget_factory.get_html(value="Endpoint")
+            header = self.ipywidget_factory.get_html(value="<h4>ENDPOINTS</h4>")
             endpoint_widgets.append(header)
 
             # Endpoints
@@ -42,7 +46,7 @@ class ManageEndpointWidget(AbstractMenuWidget):
         # 600 px
         width = "600px"
         vbox_outter = self.ipywidget_factory.get_vbox()
-        separator = self.ipywidget_factory.get_html(value="<hr/>", width=width)
+        # separator = self.ipywidget_factory.get_html(value="<hr/>", width=width)
 
         hbox_outter = self.ipywidget_factory.get_hbox()
         hbox_outter_children = []
@@ -58,7 +62,7 @@ class ManageEndpointWidget(AbstractMenuWidget):
         hbox_outter_children.append(self.get_delete_button_endpoint(url, endpoint))
         hbox_outter.children = hbox_outter_children
 
-        vbox_outter.children = [separator, hbox_outter]
+        vbox_outter.children = [hbox_outter]
 
         return vbox_outter
 
@@ -94,7 +98,10 @@ class ManageEndpointWidget(AbstractMenuWidget):
         return delete_w
 
     def get_delete_session_endpoint_widget(self, url, endpoint):
-        session_text = self.ipywidget_factory.get_text(description="Session to delete:", value="0", width="50px")
+        session_text = self.ipywidget_factory.get_text(description="Session to delete:",
+                                                       width='50px',
+                                                       style=dict(description_width='initial'),
+                                                       value="0")
 
         def delete_endpoint(button):
             try:
@@ -105,7 +112,8 @@ class ManageEndpointWidget(AbstractMenuWidget):
                 self.ipython_display.send_error(str(e))
                 return
 
-        button = self.ipywidget_factory.get_button(description="Delete")
+        button = self.ipywidget_factory.get_button(description="Delete",
+                                                   button_style="danger")
         button.on_click(delete_endpoint)
 
         return self.ipywidget_factory.get_hbox(children=[session_text, button], width="152px")
@@ -116,9 +124,18 @@ class ManageEndpointWidget(AbstractMenuWidget):
 
         info_sessions = self.spark_controller.get_all_sessions_endpoint_info(endpoint)
 
+        endpoint_session_widget = self.ipywidget_factory.get_vbox()
+        endpoint_session_list = []
+
+        heading = self.ipywidget_factory.get_html(value="<h5>" + url + "</h5>")
+        endpoint_session_list.append(heading)
+
         if len(info_sessions) > 0:
-            text = "{}:<br/>{}".format(url, "* {}".format("<br/>* ".join(info_sessions)))
+            text = "<table><tr><td>{}</td></tr></table>".format("</td></tr><hr><tr><td>".join(info_sessions))
         else:
             text = "No sessions on this endpoint."
 
-        return self.ipywidget_factory.get_html(text, width=width)
+        endpoint_session_list.append(self.ipywidget_factory.get_html(text, width=width))
+        endpoint_session_widget.children = endpoint_session_list
+
+        return endpoint_session_widget
