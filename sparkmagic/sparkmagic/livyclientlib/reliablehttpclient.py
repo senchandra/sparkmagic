@@ -64,7 +64,7 @@ class ReliableHttpClient(object):
                         auth = HTTPBasicAuth(self._endpoint.username, self._endpoint.password)
                     elif self._endpoint.auth_type == constants.AUTH_KERBEROS:
                         from requests_kerberos import HTTPKerberosAuth, REQUIRED
-                        principal = subprocess.check_output("klist | grep 'Principal:' | awk '{print $NF}'", shell=True).decode("utf-8").strip()
+                        principal = subprocess.check_output("klist | grep -i 'principal:' | awk '{print $NF}'", shell=True).decode("utf-8").strip()
                         auth = HTTPKerberosAuth(principal=principal, mutual_authentication=REQUIRED, force_preemptive=True)
                     else:
                         raise ValueError("Unsupported authentication type {}".format(self._endpoint.auth_type))
